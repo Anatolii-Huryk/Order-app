@@ -75,26 +75,4 @@ class OrderControllerTest {
                 .body("[0].item", Matchers.equalTo("Phone"))
                 .body("[0].quantity", Matchers.equalTo(5));
     }
-
-    @Test
-    public void shouldCreateOrder() {
-        Order orderSave =
-                new Order(12L, "Phone", 5L);
-        Mockito.when(orderService.add(orderSave))
-                .thenReturn(new Order(1L, 12L, "Phone", 5L, LocalDateTime.now()));
-
-        RestAssuredMockMvc.given()
-                .contentType(ContentType.JSON)
-                .body(new OrderRequestDto(
-                        orderSave.getPrice(),
-                        orderSave.getItem(),
-                        orderSave.getQuantity()))
-                .when()
-                .post("/orders")
-                .then()
-                .statusCode(200)
-                .body("item", Matchers.equalTo("Phone"))
-                .body("price", Matchers.equalTo(12))
-                .body("quantity", Matchers.equalTo(5));
-    }
 }
