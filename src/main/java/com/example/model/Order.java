@@ -42,4 +42,11 @@ public class Order {
         this.item = item;
         this.quantity = quantity;
     }
+
+    public Order(Long price, String item, Long quantity, LocalDateTime orderTime) {
+        this.price = price;
+        this.item = item;
+        this.quantity = quantity;
+        this.orderTime = orderTime;
+    }
 }

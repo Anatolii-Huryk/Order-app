@@ -37,6 +37,25 @@ class OrderControllerTest {
     }
 
     @Test
+    public void shouldShowAllProducts() {
+        List<Order> mockOrders = List.of(
+                new Order(1L, 8L, "Phone", 5L, LocalDateTime.now()),
+                new Order(2L, 10L, "Phone", 1L, LocalDateTime.now()),
+                new Order(3L, 12L, "Phone", 10L, LocalDateTime.now())
+        );
+        Mockito.when(orderService.findAll()).thenReturn(mockOrders);
+
+        RestAssuredMockMvc.when()
+                .get("/orders/all")
+                .then()
+                .statusCode(200)
+                .body("size()", Matchers.equalTo(3))
+                .body("[1].item", Matchers.equalTo("Phone"))
+                .body("[2].price", Matchers.equalTo(12))
+                .body("[0].quantity", Matchers.equalTo(5));
+    }
+
+    @Test
     public void shouldReturnLowCostItemAndReduceQuantity() {
         String item = "Phone";
         Long quantity = 2L;
@@ -52,20 +71,24 @@ class OrderControllerTest {
                 .put("/orders/find-by-item")
                 .then()
                 .body("size()", Matchers.equalTo(1))
-                .body("[0].id", Matchers.equalTo(1))
                 .body("[0].price", Matchers.equalTo(12))
                 .body("[0].item", Matchers.equalTo("Phone"))
-                .body("[0].quantity", Matchers.equalTo(3));
+                .body("[0].quantity", Matchers.equalTo(5));
     }
 
     @Test
     public void shouldCreateOrder() {
-        Order orderSave = new Order(12L, "Phone", 5L);
-        Mockito.when(orderService.add(orderSave)).thenReturn(mockOrders.get(0));
+        Order orderSave =
+                new Order(12L, "Phone", 5L);
+        Mockito.when(orderService.add(orderSave))
+                .thenReturn(new Order(1L, 12L, "Phone", 5L, LocalDateTime.now()));
 
         RestAssuredMockMvc.given()
                 .contentType(ContentType.JSON)
-                .body(new OrderRequestDto(orderSave.getItem(), orderSave.getPrice(), orderSave.getQuantity()))
+                .body(new OrderRequestDto(
+                        orderSave.getPrice(),
+                        orderSave.getItem(),
+                        orderSave.getQuantity()))
                 .when()
                 .post("/orders")
                 .then()
